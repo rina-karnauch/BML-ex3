@@ -51,6 +51,23 @@ def get_p(H):
     return len(H)
 
 
+def plot_evidence_per_noise(var_noise, evs):
+    max_evidence_index, max_evidence = np.argmax(evs), np.max(evs)
+    max_evidence_noise = var_noise[max_evidence_index]
+
+    plt.figure()
+    plt.plot(var_noise, evs, color="darkseagreen", label="evidence")
+    plt.xlabel('noise of model')
+    plt.ylabel('log-evidence')
+    plt.title('log-evidence as a function of noise of the model')
+    plt.scatter(max_evidence_noise, max_evidence, label=f'noise with max evidence: {round(max_evidence_noise, 3)}',
+                color="green",
+                alpha=.5)
+    plt.legend()
+    plt.show()
+    plt.savefig('log_evidence(noise).png')
+
+
 def plot_evidence_per_d(degrees, ev_d, i):
     best_model_i, max_evidence = np.argmax(ev_d), np.max(ev_d)
     worst_model_i, min_evidence = np.argmin(ev_d), np.min(ev_d)
@@ -82,7 +99,7 @@ def plot_models(best_model, worst_model, x, y, i):
     plt.figure()
     plt.plot(x, pred_best, color="mediumseagreen", label="best")
     plt.plot(x, pred_worst, color="darkmagenta", label="worst")
-    plt.title(f'Function {i + 1}: best and worst models')
+    plt.title(f'Function {i}: best and worst models')
     plt.fill_between(x, pred_best - std_best, pred_best + std_best, alpha=.5, color="mediumseagreen",
                      label="confidence best")
     plt.fill_between(x, pred_worst - std_worst, pred_worst + std_worst, alpha=.5, color="darkmagenta",
@@ -132,29 +149,29 @@ def main():
 
         best_model, worst_model = get_model_by_degree(best_model_deg, noise_var, alpha, x, y), get_model_by_degree(
             worst_model_deg, noise_var, alpha, x, y)
-        plot_models(best_model, worst_model, x, y, i)
+        plot_models(best_model, worst_model, x, y, i + 1)
 
         # # ------------------------------------------------------ section 2.2
-    # # load relevant data
-    # nov16 = np.load('nov162020.npy')
-    # hours = np.arange(0, 24, .5)
-    # train = nov16[:len(nov16) // 2]
-    # hours_train = hours[:len(nov16) // 2]
-    #
-    # # load prior parameters and set up basis functions
-    # mu, cov = load_prior()
-    # pbf = polynomial_basis_functions(7)
-    #
-    # noise_vars = np.linspace(.05, 2, 100)
-    # evs = np.zeros(noise_vars.shape)
-    # for i, n in enumerate(noise_vars):
-    #     # calculate the evidence
-    #     mdl = BayesianLinearRegression(mu, cov, n, pbf)
-    #     ev = log_evidence(mdl, hours_train, train)
-    #     # <your code here>
-    #
-    # # plot log-evidence versus amount of sample noise
-    # # <your code here>
+    # load relevant data
+    nov16 = np.load('nov162020.npy')
+    hours = np.arange(0, 24, .5)
+    train = nov16[:len(nov16) // 2]
+    hours_train = hours[:len(nov16) // 2]
+
+    # load prior parameters and set up basis functions
+    mu, cov = load_prior()
+    pbf = polynomial_basis_functions(7)
+
+    noise_vars = np.linspace(.05, 2, 100)
+    evs = np.zeros(noise_vars.shape)
+    for i, n in enumerate(noise_vars):
+        # calculate the evidence
+        mdl = BayesianLinearRegression(mu, cov, n, pbf)
+        ev = log_evidence(mdl, hours_train, train)
+        evs[i] = ev
+
+    # plot log-evidence versus amount of sample noise
+    plot_evidence_per_noise(noise_vars, evs)
 
 
 if __name__ == '__main__':
