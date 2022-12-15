@@ -62,6 +62,7 @@ def plot_evidence_per_d(degrees, ev_d, i):
     plt.ylabel('log-evidence')
     plt.plot(best_model_deg, max_evidence, color="cadetblue")
     plt.title(f'Function {i}, log-evidence, best degree: {best_model_deg}')
+    plt.savefig(f'Function_{i}_log_evidence_deg_{best_model_deg}.png')
     plt.show()
 
     return best_model_deg, worst_model_deg
@@ -90,6 +91,7 @@ def plot_models(best_model, worst_model, x, y, i):
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('f(x)')
+    plt.savefig(f'Function_{i}_best_worst_models_fit.png')
     plt.show()
 
 
